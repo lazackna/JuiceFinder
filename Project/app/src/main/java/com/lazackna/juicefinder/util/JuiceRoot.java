@@ -42,7 +42,7 @@ class Poi {
     public StatusType statusType;
     public SubmissionStatus submissionStatus;
     public boolean isRecentlyVerified;
-    public OffsetDateTime dateLastVerified;
+    public String dateLastVerified;
     public long id;
     public String uuid;
     public long dataProviderID;
@@ -52,9 +52,9 @@ class Poi {
     public Connection[] connections;
     public long numberOfPoints;
     public long statusTypeID;
-    public OffsetDateTime dateLastStatusUpdate;
+    public String dateLastStatusUpdate;
     public long dataQualityLevel;
-    public OffsetDateTime dateCreated;
+    public String dateCreated;
     public long submissionStatusTypeID;
 }
 

@@ -5,7 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Debug;
+import android.util.Log;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+import com.lazackna.juicefinder.util.JuiceRoot;
+import com.lazackna.juicefinder.util.TestData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,5 +31,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
+        Gson gson = new Gson();
+        JuiceRoot root = gson.fromJson(TestData.data, JuiceRoot.class);
+        Log.d("hahahah", root.toString());
+
     }
 }
