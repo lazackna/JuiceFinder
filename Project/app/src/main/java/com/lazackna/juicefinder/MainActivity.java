@@ -80,6 +80,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String buildUrl() {
-        return "https://api.openchargemap.io/v3/poi?&key=" + apiKey + "&countrycode=NL&output=geojson&maxresults=2";
+        OpenChargeMapRequest request = new OpenChargeMapRequest(
+                new OpenChargeMapRequestBuilder().BuildRequest(apiKey)
+                        .Location(51.6002069, 4.6965766)
+                        .IncludeComments()
+                        .Distance(100)
+                        .MaxResults(10)
+                        .CountryCode("NL"));
+
+        //Log.d("test",request.toUrl());
+        return request.toUrl();
     }
 }
