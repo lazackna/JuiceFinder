@@ -1,6 +1,6 @@
 package com.lazackna.juicefinder;
 
-import com.google.firebase.firestore.GeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class OpenChargeMapRequestBuilder {
         this.output = "geojson";
         this.includeComments = false;
         this.countryCode = "NL";
-        this.location = new GeoPoint(0, 0);
+        this.location = new GeoPoint(0.0d, 0.0d);
         this.maxResults = 1000;
         this.distance = 1000;
         return this;

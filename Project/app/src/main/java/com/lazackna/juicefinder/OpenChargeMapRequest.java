@@ -2,7 +2,7 @@ package com.lazackna.juicefinder;
 
 import android.location.Geocoder;
 
-import com.google.firebase.firestore.GeoPoint;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.List;
