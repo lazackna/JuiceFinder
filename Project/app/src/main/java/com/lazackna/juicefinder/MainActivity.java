@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 response -> {
                     Gson gson1 = new Gson();
                     JuiceRoot root = gson1.fromJson(response.toString(), JuiceRoot.class);
+                    openMap(root);
                     Log.d("test","test");
                 },
                 error -> finish()
