@@ -45,36 +45,24 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        Gson gson = new Gson();
-        JuiceRoot root = gson.fromJson(TestData.data, JuiceRoot.class);
-        Log.d("hahahah", root.toString());
 
+        makeVolleyRequest();
+
+    }
+
+    private void makeVolleyRequest(){
         requestQueue = Volley.newRequestQueue(this);
+
         final JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET, // Use HTTP GET to retrieve the data from the NASA API
+                Request.Method.GET, // Use HTTP GET to retrieve the data from the ChargeMap API
                 buildUrl(), // This is the actual URL used to retrieve the data
                 null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    // The callback for handling the response
-                    public void onResponse(JSONObject response) {
-                        //Log.d(LOGTAG, "Volley response: " + response.toString());
-                        Gson gson = new Gson();
-                        JuiceRoot root = gson.fromJson(response.toString(), JuiceRoot.class);
-                        Log.d("test","test");
-
-                    }
+                response -> {
+                    Gson gson1 = new Gson();
+                    JuiceRoot root = gson1.fromJson(response.toString(), JuiceRoot.class);
+                    Log.d("test","test");
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    // The callback for handling a transmission error
-                    public void onErrorResponse(VolleyError error) {
-                        // Handle the error
-                        //Log.e("haha", error.getLocalizedMessage());
-                        finish();
-                        //listener.onPhotoError(new Error(error.getLocalizedMessage()));
-                    }
-                }
+                error -> finish()
         );
         requestQueue.add(request);
     }
@@ -88,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                         .MaxResults(10)
                         .CountryCode("NL"));
 
-        //Log.d("test",request.toUrl());
         return request.toUrl();
     }
 }
