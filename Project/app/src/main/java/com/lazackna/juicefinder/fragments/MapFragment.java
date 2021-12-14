@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,6 +24,7 @@ import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 import org.json.JSONObject;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -100,6 +102,8 @@ public class MapFragment extends Fragment {
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
 
+
+
         this.apiHandler.makeVolleyObjectRequest(
                 response -> {
                     Gson gson = new Gson();
@@ -109,6 +113,15 @@ public class MapFragment extends Fragment {
                 },
                 null
         );
+    }
+
+    public void setMapInteraction(boolean isInactive){
+        binding.map.setOnTouchListener((view, motionEvent) -> isInactive);
+
+        if (isInactive)
+            binding.map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
+        else
+            binding.map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
     }
 
     private void fillMap(JuiceRoot root) {
