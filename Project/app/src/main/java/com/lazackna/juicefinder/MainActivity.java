@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
                 .addToBackStack("popup")
                 .commit();
         popupActive = true;
-        MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
-        mapFragment.setMapInteraction(popupActive);
+        setMapInteraction(popupActive);
+
     }
 
     @Override
@@ -76,13 +76,20 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
             Log.i("MainActivity", "popping backstack");
             manager.popBackStack();
             popupActive = false;
-            MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
-            mapFragment.setMapInteraction(popupActive);
+            setMapInteraction(popupActive);
 
         } else {
             Log.i("MainActivity", "nothing on backstack, calling super");
             super.onBackPressed();
         }
+    }
+
+    public boolean setMapInteraction(boolean isInteractive){
+        MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
+        if(mapFragment != null){
+            mapFragment.setMapInteraction(isInteractive);
+            return true;
+        } else return false;
     }
 
     @Override
