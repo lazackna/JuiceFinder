@@ -1,11 +1,6 @@
-package com.lazackna.juicefinder;
+package com.lazackna.juicefinder.util.API;
 
 import org.osmdroid.util.GeoPoint;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class OpenChargeMapRequestBuilder {
 

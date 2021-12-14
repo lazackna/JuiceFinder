@@ -1,12 +1,8 @@
-package com.lazackna.juicefinder;
-
-import android.location.Geocoder;
+package com.lazackna.juicefinder.util.API;
 
 import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class OpenChargeMapRequest {
 
