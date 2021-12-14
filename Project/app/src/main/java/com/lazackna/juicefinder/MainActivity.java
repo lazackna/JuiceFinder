@@ -2,10 +2,10 @@ package com.lazackna.juicefinder;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,15 +13,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
-import com.lazackna.juicefinder.util.CustomJsonArrayRequest;
-import com.lazackna.juicefinder.util.JuiceRoot;
+import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 import com.lazackna.juicefinder.util.TestData;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
                 error -> finish()
         );
         requestQueue.add(request);
+    }
+
+    private void openMap(JuiceRoot root) {
+        Intent intent = new Intent(this, MapActivity.class);
+        intent.putExtra("juice", root);
+        startActivity(intent);
     }
 
     private String buildUrl() {
