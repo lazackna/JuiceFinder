@@ -65,7 +65,6 @@ public class MapActivity extends AppCompatActivity {
             Marker marker = new Marker(binding.map);
             marker.setPosition(point);
             marker.setAnchor(Marker.ANCHOR_LEFT, Marker.ANCHOR_LEFT);
-            //marker.setInfoWindowAnchor(Marker.ANCHOR_LEFT, Marker.ANCHOR_RIGHT);
             marker.setInfoWindow(null);
             marker.setIcon(ResourcesCompat.getDrawable(this.getResources(), R.drawable.charger_icon, null));
             binding.map.getOverlays().add(marker);
