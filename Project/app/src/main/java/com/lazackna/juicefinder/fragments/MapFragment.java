@@ -1,5 +1,6 @@
 package com.lazackna.juicefinder.fragments;
 
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -18,6 +19,9 @@ import com.lazackna.juicefinder.OnMarkerClickListener;
 import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentMapBinding;
 import com.lazackna.juicefinder.util.API.ApiHandler;
+import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
+import com.lazackna.juicefinder.util.GPS.GPSManager;
+import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 
@@ -38,7 +42,7 @@ import java.util.Objects;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements IGPSSubscriber {
 
     private static final String TAG = MapFragment.class.getName();
 
@@ -55,6 +59,10 @@ public class MapFragment extends Fragment {
 
     private ApiHandler apiHandler;
     private HashMap<Marker, Feature> markerMap;
+
+    private GPSManager manager;
+    private Location lastLocation;
+    private boolean firstUpdate = false;
 
     private static int selectedMarker = 0;
 
@@ -102,17 +110,6 @@ public class MapFragment extends Fragment {
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
 
-
-
-        this.apiHandler.makeVolleyObjectRequest(
-                response -> {
-                    Gson gson = new Gson();
-                    JuiceRoot root = gson.fromJson(response.toString(), JuiceRoot.class);
-                    Log.d(TAG,"received juice root with length: " + root.features.length);
-                    fillMap(root);
-                },
-                null
-        );
     }
 
     public void setMapInteraction(boolean isInactive){
@@ -149,10 +146,14 @@ public class MapFragment extends Fragment {
                 }
             });
         }
-        double[] coords = root.features[0].geometry.coordinates;
-        GeoPoint point = new GeoPoint(coords[1], coords[0]);
+        try {
+            double[] coords = root.features[0].geometry.coordinates;
+            GeoPoint point = new GeoPoint(coords[1], coords[0]);
 
-        binding.map.getController().setCenter(point);
+            binding.map.getController().setCenter(point);
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
@@ -162,7 +163,45 @@ public class MapFragment extends Fragment {
         binding = FragmentMapBinding.inflate(inflater, container, false);
 
         initializeMap();
+        initializeGPS();
+
+        //this.firstUpdate = false;
 
         return binding.getRoot();
+    }
+
+    private void initializeGPS() {
+        this.manager = GPSManager.getInstance(getContext());
+        this.manager.subscribe(this);
+        this.manager.start(getContext());
+    }
+
+    @Override
+    public void notifyLocationChanged(Location location) {
+        lastLocation = location;
+        if (!firstUpdate) {
+            firstUpdate = true;
+            this.apiHandler.makeVolleyObjectRequest(
+                    response -> {
+                        Gson gson = new Gson();
+                        JuiceRoot root = gson.fromJson(response.toString(), JuiceRoot.class);
+                        Log.d(TAG,"received juice root with length: " + root.features.length);
+                        fillMap(root);
+                    },
+                    error -> {
+                        Log.d("e", "e");
+                    },
+                    new OpenChargeMapRequestBuilder()
+                            .Location(lastLocation.getLatitude(), lastLocation.getLongitude())
+                            .CountryCode("NL")
+                            .Distance(1000)
+                            .IncludeComments()
+                            .MaxResults(100)
+                            .build(this.apiHandler.getApiKey()).toUrl()
+            );
+        }
+
+        GeoPoint g = new GeoPoint(location);
+        this.binding.map.getController().animateTo(g);
     }
 }

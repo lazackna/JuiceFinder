@@ -36,6 +36,7 @@ public class OpenChargeMapRequest {
                 "&output=" + output +
                 "&includecomments=" + includeComments +
                 "&maxresults=" + maxResults +
+                "distanceunit=km" +
                 "&distance=" + distance;
     }
 }
