@@ -60,7 +60,7 @@ public class ApiHandler {
                         .Location(51.6002069, 4.6965766)
                         .IncludeComments()
                         .Distance(100)
-                        .MaxResults(10)
+                        .MaxResults(5)
                         .CountryCode("NL"));
 
         return request.toUrl();

@@ -1,5 +1,6 @@
 package com.lazackna.juicefinder.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -18,20 +19,27 @@ import com.lazackna.juicefinder.OnMarkerClickListener;
 import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentMapBinding;
 import com.lazackna.juicefinder.util.API.ApiHandler;
+import com.lazackna.juicefinder.util.API.DownloadRoadTask;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.PolyOverlayWithIW;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -130,7 +138,7 @@ public class MapFragment extends Fragment {
             GeoPoint point = new GeoPoint(coords[1], coords[0]);
             Marker marker = new Marker(binding.map);
             marker.setPosition(point);
-            marker.setAnchor(Marker.ANCHOR_LEFT, Marker.ANCHOR_LEFT);
+            marker.setAnchor(0.2f, 0.2f);
             marker.setInfoWindow(null);
             marker.setIcon(ResourcesCompat.getDrawable(this.getResources(), R.drawable.charger_icon, null));
             this.binding.map.getOverlays().add(marker);
@@ -153,6 +161,26 @@ public class MapFragment extends Fragment {
         GeoPoint point = new GeoPoint(coords[1], coords[0]);
 
         binding.map.getController().setCenter(point);
+
+        ArrayList<GeoPoint> points = new ArrayList<>();
+        markerMap.values().forEach(val -> points.add(new GeoPoint(val.geometry.coordinates[1], val.geometry.coordinates[0])));
+
+        try {
+            Road road = new DownloadRoadTask(getContext(), points).execute().get();
+            drawRouteOnMap(road, Color.RED);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void drawRouteOnMap(@NotNull Road road, int color) {
+        Log.i(TAG, "Drawing route");
+        PolyOverlayWithIW overlay = RoadManager.buildRoadOverlay(road, color, 20f);
+        this.binding.map.getOverlays().add(overlay);
+        this.binding.map.invalidate();
     }
 
     @Override
