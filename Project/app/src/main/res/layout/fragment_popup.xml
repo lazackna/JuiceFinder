@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.PopupFragment">
-
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
     <View
         android:id="@+id/background"
         android:layout_width="match_parent"
@@ -31,17 +33,20 @@
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/background"
-        tools:srcCompat="@drawable/charger_red" />
+        android:src="@drawable/charger_red"/>
 
     <TextView
         android:id="@+id/details_chr_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="@font/inria_sans_bold"
         android:text="Abdisstraat 25"
-        android:textSize="30dp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeStepGranularity="2sp"
+        android:autoSizeMinTextSize="2dp"
+        android:autoSizeMaxTextSize="200dp"
         app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
         app:layout_constraintTop_toTopOf="@+id/background" />
 
@@ -78,5 +83,7 @@
         app:layout_constraintEnd_toEndOf="@+id/ChargerTypeIcon"
         app:layout_constraintStart_toStartOf="@+id/ChargerTypeIcon"
         app:layout_constraintTop_toBottomOf="@+id/ChargerTypeIcon" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>
