@@ -1,5 +1,6 @@
 package com.lazackna.juicefinder.fragments;
 
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -12,12 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.volley.Response;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.lazackna.juicefinder.MainActivity;
 import com.lazackna.juicefinder.OnMarkerClickListener;
 import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentMapBinding;
 import com.lazackna.juicefinder.util.API.ApiHandler;
+import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
+import com.lazackna.juicefinder.util.FilterSettings;
+import com.lazackna.juicefinder.util.GPS.GPSManager;
+import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
+import com.lazackna.juicefinder.util.IRootCallback;
+import com.lazackna.juicefinder.util.MapThread;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 
@@ -27,10 +35,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -38,7 +48,7 @@ import java.util.Objects;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallback {
 
     private static final String TAG = MapFragment.class.getName();
 
@@ -56,6 +66,11 @@ public class MapFragment extends Fragment {
     private ApiHandler apiHandler;
     private HashMap<Marker, Feature> markerMap;
 
+    private GPSManager manager;
+    private Location lastLocation;
+    private boolean firstUpdate = false;
+
+    private MapThread mapThread;
     private static int selectedMarker = 0;
 
     public MapFragment() {
@@ -102,17 +117,18 @@ public class MapFragment extends Fragment {
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
 
+    }
 
-
-        this.apiHandler.makeVolleyObjectRequest(
-                response -> {
-                    Gson gson = new Gson();
-                    JuiceRoot root = gson.fromJson(response.toString(), JuiceRoot.class);
-                    Log.d(TAG,"received juice root with length: " + root.features.length);
-                    fillMap(root);
-                },
-                null
-        );
+    private void clearMap() {
+        if (binding.map == null) return;
+        Iterator<Overlay> iterator = binding.map.getOverlays().iterator();
+        while(iterator.hasNext()) {
+            Overlay o = iterator.next();
+            if (o instanceof Marker) {
+                binding.map.getOverlays().remove(o);
+            }
+        }
+        markerMap.clear();
     }
 
     public void setMapInteraction(boolean isInactive){
@@ -124,8 +140,15 @@ public class MapFragment extends Fragment {
             binding.map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
     }
 
+    private int markersPut;
     private void fillMap(JuiceRoot root) {
+        clearMap();
+        this.markersPut = 0;
+        FilterSettings settings = MainActivity.viewModel.getSettings().getValue();
+
         for  (Feature f : root.features) {
+            if (settings != null)
+            if (markersPut >= settings.maxResults) break;
             double[] coords = f.geometry.coordinates;
             GeoPoint point = new GeoPoint(coords[1], coords[0]);
             Marker marker = new Marker(binding.map);
@@ -136,6 +159,7 @@ public class MapFragment extends Fragment {
             this.binding.map.getOverlays().add(marker);
 
             this.markerMap.put(marker,f);
+            markersPut++;
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -149,10 +173,14 @@ public class MapFragment extends Fragment {
                 }
             });
         }
-        double[] coords = root.features[0].geometry.coordinates;
-        GeoPoint point = new GeoPoint(coords[1], coords[0]);
+        try {
+            double[] coords = root.features[0].geometry.coordinates;
+            GeoPoint point = new GeoPoint(coords[1], coords[0]);
 
-        binding.map.getController().setCenter(point);
+            binding.map.getController().setCenter(point);
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
@@ -162,7 +190,50 @@ public class MapFragment extends Fragment {
         binding = FragmentMapBinding.inflate(inflater, container, false);
 
         initializeMap();
+        initializeGPS();
+        MainActivity.viewModel.getSettings().observe(getViewLifecycleOwner(), s -> {
+            if (lastLocation == null) return;
+            showRetrievingMessage();
+            this.mapThread = new MapThread(lastLocation, this.apiHandler, TAG, this, s);
+            this.mapThread.start();
+        });
+        //this.firstUpdate = false;
 
         return binding.getRoot();
+    }
+
+    private void initializeGPS() {
+        this.manager = GPSManager.getInstance(getContext());
+        this.manager.subscribe(this);
+        this.manager.start(getContext());
+    }
+
+    private void showRetrievingMessage() {
+        View view = getView();
+        if (view != null)
+            Snackbar.make(view, "Retrieving charging points", Snackbar.LENGTH_SHORT).show();
+    }
+
+
+    @Override
+    public void notifyLocationChanged(Location location) {
+        lastLocation = location;
+
+        if (!firstUpdate && location != null) {
+            firstUpdate = true;
+            showRetrievingMessage();
+            this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());
+            this.mapThread.start();
+        }
+
+        GeoPoint g = new GeoPoint(location);
+        this.binding.map.getController().animateTo(g);
+    }
+
+    @Override
+    public void notifyRoot(JuiceRoot root) {
+        if (root != null) {
+            fillMap(root);
+        }
     }
 }

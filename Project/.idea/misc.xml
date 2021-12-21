@@ -3,6 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/activity_main.xml" value="0.12360688956433637" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/activity_map.xml" value="0.16847826086956522" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/filter_menu.xml" value="0.12537993920972645" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/fragment_filter.xml" value="0.4" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/fragment_filter2.xml" value="0.1" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/layout/fragment_popup.xml" value="0.16847826086956522" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/menu/filter_menu.xml" value="0.4582210242587601" />
+        <entry key="..\:/Users/User/Desktop/TI Avans/Jaar 2/Periode 2/TDMD/Eindopdracht/JuiceFinder/Project/app/src/main/res/menu/toolbar.xml" value="0.4" />
         <entry key="..\:/Users/david/Documents/git projects/JuiceFinder/Project/app/src/main/res/drawable/rectangle.xml" value="0.19537037037037036" />
         <entry key="..\:/Users/david/Documents/git projects/JuiceFinder/Project/app/src/main/res/font/inria_sans.xml" value="0.24895833333333334" />
         <entry key="..\:/Users/david/Documents/git projects/JuiceFinder/Project/app/src/main/res/layout/activity_main.xml" value="0.21875" />

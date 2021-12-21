@@ -3,10 +3,10 @@ package com.lazackna.juicefinder.util.API;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -42,27 +42,33 @@ public class ApiHandler {
         requestQueue = Volley.newRequestQueue(context);
     }
 
-    public void makeVolleyObjectRequest(@NonNull Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener){
+    public String getApiKey() {
+        return this.apiKey;
+    }
+
+    public void makeVolleyObjectRequest(@NonNull Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener, String url){
 
         final JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET, // Use HTTP GET to retrieve the data from the ChargeMap API
-                buildUrl(), // This is the actual URL used to retrieve the data
+                url, // This is the actual URL used to retrieve the data
                 null,
                 responseListener,
                 errorListener
         );
+        request.setRetryPolicy(new DefaultRetryPolicy(15000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(request);
+
     }
 
-    private String buildUrl() {
-        OpenChargeMapRequest request = new OpenChargeMapRequest(
-                new OpenChargeMapRequestBuilder().BuildRequest(apiKey)
-                        .Location(51.6002069, 4.6965766)
-                        .IncludeComments()
-                        .Distance(100)
-                        .MaxResults(50)
-                        .CountryCode("NL"));
-
-        return request.toUrl();
-    }
+//    private String buildUrl() {
+//        OpenChargeMapRequest request = new OpenChargeMapRequest(
+//                new OpenChargeMapRequestBuilder().build(apiKey)
+//                        .Location(51.6002069, 4.6965766)
+//                        .IncludeComments()
+//                        .Distance(100)
+//                        .MaxResults(50)
+//                        .CountryCode("NL"));
+//
+//        return request.toUrl();
+//    }
 }
