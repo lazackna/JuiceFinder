@@ -19,7 +19,6 @@ public class OpenChargeMapRequestBuilder {
     public OpenChargeMapRequest build(String key){
         this.key = key;
 //        this.output = "geojson";
-        this.includeComments = false;
 //        this.countryCode = "NL";
 //        this.location = new GeoPoint(0.0d, 0.0d);
 //        this.maxResults = 1000;

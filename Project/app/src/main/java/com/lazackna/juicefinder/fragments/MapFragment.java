@@ -22,6 +22,8 @@ import com.lazackna.juicefinder.util.API.ApiHandler;
 import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
 import com.lazackna.juicefinder.util.GPS.GPSManager;
 import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
+import com.lazackna.juicefinder.util.IRootCallback;
+import com.lazackna.juicefinder.util.MapThread;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 
@@ -42,7 +44,7 @@ import java.util.Objects;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements IGPSSubscriber {
+public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallback {
 
     private static final String TAG = MapFragment.class.getName();
 
@@ -64,6 +66,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber {
     private Location lastLocation;
     private boolean firstUpdate = false;
 
+    private MapThread mapThread;
     private static int selectedMarker = 0;
 
     public MapFragment() {
@@ -176,32 +179,25 @@ public class MapFragment extends Fragment implements IGPSSubscriber {
         this.manager.start(getContext());
     }
 
+
     @Override
     public void notifyLocationChanged(Location location) {
         lastLocation = location;
-        if (!firstUpdate) {
+
+        if (!firstUpdate && location != null) {
             firstUpdate = true;
-            this.apiHandler.makeVolleyObjectRequest(
-                    response -> {
-                        Gson gson = new Gson();
-                        JuiceRoot root = gson.fromJson(response.toString(), JuiceRoot.class);
-                        Log.d(TAG,"received juice root with length: " + root.features.length);
-                        fillMap(root);
-                    },
-                    error -> {
-                        Log.d("e", "e");
-                    },
-                    new OpenChargeMapRequestBuilder()
-                            .Location(lastLocation.getLatitude(), lastLocation.getLongitude())
-                            .CountryCode("NL")
-                            .Distance(1000)
-                            .IncludeComments()
-                            .MaxResults(100)
-                            .build(this.apiHandler.getApiKey()).toUrl()
-            );
+            this.mapThread = new MapThread(location, this.apiHandler, TAG, this);
+            this.mapThread.start();
         }
 
         GeoPoint g = new GeoPoint(location);
         this.binding.map.getController().animateTo(g);
+    }
+
+    @Override
+    public void notifyRoot(JuiceRoot root) {
+        if (root != null) {
+            fillMap(root);
+        }
     }
 }

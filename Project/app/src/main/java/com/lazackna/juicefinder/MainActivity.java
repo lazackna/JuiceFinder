@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import com.lazackna.juicefinder.databinding.ActivityMainBinding;
 import com.lazackna.juicefinder.fragments.MapFragment;
 import com.lazackna.juicefinder.fragments.PopupFragment;
+import com.lazackna.juicefinder.util.FilterSettings;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 
 import org.osmdroid.config.Configuration;
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
     private ActivityMainBinding binding;
     private FragmentManager manager;
     private boolean popupActive = false;
+
+    public static FilterSettings filterSettings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         Configuration.getInstance().setUserAgentValue("JuiceFinder");
 
         this.manager = getSupportFragmentManager();
+        filterSettings = new FilterSettings();
         clearBackstack();
         makeMapFragment();
 
