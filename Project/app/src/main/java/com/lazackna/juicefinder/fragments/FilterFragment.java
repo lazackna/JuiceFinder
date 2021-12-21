@@ -7,32 +7,34 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.Switch;
 
+import com.lazackna.juicefinder.MainActivity;
 import com.lazackna.juicefinder.R;
-import com.lazackna.juicefinder.databinding.FragmentPopupBinding;
-import com.lazackna.juicefinder.util.juiceroot.Connection;
-import com.lazackna.juicefinder.util.juiceroot.Feature;
+
+import com.lazackna.juicefinder.databinding.FragmentFilterBinding;
+import com.lazackna.juicefinder.util.FilterSettings;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link PopupFragment#newInstance} factory method to
+ * Use the {@link FilterFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PopupFragment extends Fragment {
+public class FilterFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private FragmentPopupBinding binding;
-
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
-    public PopupFragment() {
+    private FragmentFilterBinding binding;
+
+    public FilterFragment() {
         // Required empty public constructor
     }
 
@@ -42,11 +44,11 @@ public class PopupFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment PopupFragment.
+     * @return A new instance of fragment filter.
      */
     // TODO: Rename and change types and number of parameters
-    public static PopupFragment newInstance(String param1, String param2) {
-        PopupFragment fragment = new PopupFragment();
+    public static FilterFragment newInstance(String param1, String param2) {
+        FilterFragment fragment = new FilterFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,40 +65,35 @@ public class PopupFragment extends Fragment {
         }
     }
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Bundle bundle = requireArguments();
-        Feature f = (Feature) bundle.getSerializable("feature");
+        this.binding = FragmentFilterBinding.inflate(inflater, container, false);
 
-        binding = FragmentPopupBinding.inflate(inflater, container, false);
+        this.binding.filterApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int maxResults = Integer.parseInt(binding.filterResults.getText().toString());
+                int distance = Integer.parseInt(binding.filterDistance.getText().toString());
+                String unit = "miles";
+                if (binding.filterUnit.isChecked()) unit = "km";
 
-        binding.detailsChrName.setText(f.properties.name);
-        binding.detailsChrPower.setText(getPowerLevelString(f.properties.poi.connections));
-        binding.detailsChrPrice.setText(f.properties.connectionType);
-        binding.detailsChrType.setText(f.type);
+                if (maxResults < 0) maxResults = 0;
+                if (maxResults > 400) maxResults = 400;
+                if (distance < 0) distance = 0;
+                if (distance > 100) distance = 100;
 
-        return binding.getRoot();
-    }
+                FilterSettings settings = new FilterSettings();
+                settings.distance = distance;
+                settings.maxResults = maxResults;
+                settings.unit = unit;
 
+                MainActivity.viewModel.setSettings(settings);
 
-    public String getPowerLevelString(Connection[] connections){
+            }
+        });
 
-        if(connections.length == 0) return "0 Kw";
-
-        double lowest = connections[0].powerKW;
-        double highest = connections[0].powerKW;
-
-        for (int i = 1; i < connections.length; i++) {
-            double power = connections[i].powerKW;
-            if(power > highest) highest = power;
-            if(power < lowest) lowest = power;
-        }
-
-        if(lowest == highest) return lowest + " Kw";
-        else return "(" + lowest + " - " + highest + ") Kw";
+        return this.binding.getRoot();
     }
 }
