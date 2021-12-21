@@ -1,5 +1,7 @@
 package com.lazackna.juicefinder.fragments;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -106,6 +108,10 @@ public class MapFragment extends Fragment {
         MyLocationNewOverlay locationNewOverlay = new MyLocationNewOverlay(
                 new GpsMyLocationProvider(requireContext()), binding.map);
         locationNewOverlay.enableMyLocation();
+        Bitmap icon = BitmapFactory.decodeResource(getContext().getResources(),
+                R.drawable.car);
+        locationNewOverlay.setDirectionArrow(icon, icon);
+        locationNewOverlay.setPersonIcon(icon);
         binding.map.getOverlays().add(locationNewOverlay);
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
@@ -142,19 +148,15 @@ public class MapFragment extends Fragment {
             marker.setInfoWindow(null);
             marker.setIcon(ResourcesCompat.getDrawable(this.getResources(), R.drawable.charger_icon, null));
             this.binding.map.getOverlays().add(marker);
-
             this.markerMap.put(marker,f);
-            marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    //TODO only select top marker.
-                    Feature f = markerMap.get(marker);
-                    if (getActivity() instanceof OnMarkerClickListener) {
-                        OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
-                        a.onClick(f);
-                    }
-                    return false;
+            marker.setOnMarkerClickListener((marker1, mapView) -> {
+                //TODO only select top marker.
+                Feature f1 = markerMap.get(marker1);
+                if (getActivity() instanceof OnMarkerClickListener) {
+                    OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
+                    a.onClick(f1);
                 }
+                return false;
             });
         }
         double[] coords = root.features[0].geometry.coordinates;
@@ -168,9 +170,7 @@ public class MapFragment extends Fragment {
         try {
             Road road = new DownloadRoadTask(getContext(), points).execute().get();
             drawRouteOnMap(road, Color.RED);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
 
