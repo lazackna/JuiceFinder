@@ -40,7 +40,7 @@ public class GPSManager {
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 latestLocation = locationResult.getLastLocation();
-
+                notifySubscribers(latestLocation);
             }
         };
         this.client = LocationServices.getFusedLocationProviderClient(context);

@@ -177,7 +177,6 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         popupActive = true;
         MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
         mapFragment.setMapInteraction(popupActive);
-        mapFragment.drawRouteFromUser(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]), Color.BLUE);
     }
 
     @Override

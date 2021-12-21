@@ -185,7 +185,6 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
                     }
                     return false;
                 }
-                return false;
             });
         }
         try {
@@ -200,12 +199,10 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     public void drawRouteFromUser(GeoPoint geoPoint, int color){
         System.out.println();
-
-        GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(requireContext());
-        Location lastKnownLocation = locationProvider.getLastKnownLocation();
-        if(lastKnownLocation != null) {
+        //TODO: location does not update
+        if(lastLocation != null) {
             ArrayList<GeoPoint> points = new ArrayList<>();
-            points.add(new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+            points.add(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
             points.add(geoPoint);
             try {
                 Road road = new DownloadRoadTask(getContext(), points).execute().get();
@@ -253,7 +250,6 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         if (view != null)
             Snackbar.make(view, "Retrieving charging points", Snackbar.LENGTH_SHORT).show();
     }
-
 
     @Override
     public void notifyLocationChanged(Location location) {

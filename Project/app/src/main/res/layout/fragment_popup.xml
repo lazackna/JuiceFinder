@@ -83,6 +83,17 @@
         app:layout_constraintEnd_toEndOf="@+id/ChargerTypeIcon"
         app:layout_constraintStart_toStartOf="@+id/ChargerTypeIcon"
         app:layout_constraintTop_toBottomOf="@+id/ChargerTypeIcon" />
+
+    <Button
+        android:id="@+id/details_route_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="go to this charge"
+        app:layout_constraintBottom_toBottomOf="@+id/background"
+        app:layout_constraintEnd_toEndOf="@+id/background"
+        app:layout_constraintStart_toStartOf="@+id/background"
+        app:layout_constraintTop_toTopOf="@+id/background"
+        app:layout_constraintVertical_bias="0.93" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

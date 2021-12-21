@@ -1,5 +1,6 @@
 package com.lazackna.juicefinder.fragments;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,8 @@ import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentPopupBinding;
 import com.lazackna.juicefinder.util.juiceroot.Connection;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
+
+import org.osmdroid.util.GeoPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,6 +82,11 @@ public class PopupFragment extends Fragment {
         binding.detailsChrPower.setText(getPowerLevelString(f.properties.poi.connections));
         binding.detailsChrPrice.setText(f.properties.connectionType);
         binding.detailsChrType.setText(f.type);
+
+        binding.detailsRouteStart.setOnClickListener(click ->{
+            //TODO: add creation of route here
+            //mapFragment.drawRouteFromUser(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]), Color.BLUE);
+        });
 
         return binding.getRoot();
     }
