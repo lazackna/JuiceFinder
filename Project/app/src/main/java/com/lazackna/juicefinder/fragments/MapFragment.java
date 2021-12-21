@@ -174,17 +174,14 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             this.binding.map.getOverlays().add(marker);
             this.markerMap.put(marker,f);
             markersPut++;
-            marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    //TODO only select top marker.
-                    Feature f = markerMap.get(marker);
-                    if (getActivity() instanceof OnMarkerClickListener) {
-                        OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
-                        a.onClick(f);
-                    }
-                    return false;
+            marker.setOnMarkerClickListener((marker1, mapView) -> {
+                //TODO only select top marker.
+                Feature f1 = markerMap.get(marker1);
+                if (getActivity() instanceof OnMarkerClickListener) {
+                    OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
+                    a.onClick(f1);
                 }
+                return false;
             });
         }
         try {
@@ -198,8 +195,6 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
     }
 
     public void drawRouteFromUser(GeoPoint geoPoint, int color){
-        System.out.println();
-        //TODO: location does not update
         if(lastLocation != null) {
             ArrayList<GeoPoint> points = new ArrayList<>();
             points.add(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
