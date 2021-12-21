@@ -14,6 +14,7 @@ public class OpenChargeMapRequest {
     private Boolean includeComments;
     private int maxResults;
     private int distance;
+    private String distanceUnit;
 
 
     public OpenChargeMapRequest(OpenChargeMapRequestBuilder builder) {

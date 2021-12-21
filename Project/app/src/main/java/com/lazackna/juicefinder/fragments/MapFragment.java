@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.volley.Response;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.lazackna.juicefinder.MainActivity;
 import com.lazackna.juicefinder.OnMarkerClickListener;
@@ -20,6 +21,7 @@ import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentMapBinding;
 import com.lazackna.juicefinder.util.API.ApiHandler;
 import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
+import com.lazackna.juicefinder.util.FilterSettings;
 import com.lazackna.juicefinder.util.GPS.GPSManager;
 import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
 import com.lazackna.juicefinder.util.IRootCallback;
@@ -33,10 +35,12 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
@@ -115,6 +119,18 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     }
 
+    private void clearMap() {
+        if (binding.map == null) return;
+        Iterator<Overlay> iterator = binding.map.getOverlays().iterator();
+        while(iterator.hasNext()) {
+            Overlay o = iterator.next();
+            if (o instanceof Marker) {
+                binding.map.getOverlays().remove(o);
+            }
+        }
+        markerMap.clear();
+    }
+
     public void setMapInteraction(boolean isInactive){
         binding.map.setOnTouchListener((view, motionEvent) -> isInactive);
 
@@ -124,8 +140,15 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             binding.map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.SHOW_AND_FADEOUT);
     }
 
+    private int markersPut;
     private void fillMap(JuiceRoot root) {
+        clearMap();
+        this.markersPut = 0;
+        FilterSettings settings = MainActivity.viewModel.getSettings().getValue();
+
         for  (Feature f : root.features) {
+            if (settings != null)
+            if (markersPut >= settings.maxResults) break;
             double[] coords = f.geometry.coordinates;
             GeoPoint point = new GeoPoint(coords[1], coords[0]);
             Marker marker = new Marker(binding.map);
@@ -136,6 +159,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             this.binding.map.getOverlays().add(marker);
 
             this.markerMap.put(marker,f);
+            markersPut++;
             marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -167,7 +191,12 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
         initializeMap();
         initializeGPS();
-
+        MainActivity.viewModel.getSettings().observe(getViewLifecycleOwner(), s -> {
+            if (lastLocation == null) return;
+            showRetrievingMessage();
+            this.mapThread = new MapThread(lastLocation, this.apiHandler, TAG, this, s);
+            this.mapThread.start();
+        });
         //this.firstUpdate = false;
 
         return binding.getRoot();
@@ -179,6 +208,12 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         this.manager.start(getContext());
     }
 
+    private void showRetrievingMessage() {
+        View view = getView();
+        if (view != null)
+            Snackbar.make(view, "Retrieving charging points", Snackbar.LENGTH_SHORT).show();
+    }
+
 
     @Override
     public void notifyLocationChanged(Location location) {
@@ -186,7 +221,8 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
         if (!firstUpdate && location != null) {
             firstUpdate = true;
-            this.mapThread = new MapThread(location, this.apiHandler, TAG, this);
+            showRetrievingMessage();
+            this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());
             this.mapThread.start();
         }
 

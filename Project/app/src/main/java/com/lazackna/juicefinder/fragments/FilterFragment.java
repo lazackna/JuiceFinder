@@ -7,8 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Switch;
 
+import com.lazackna.juicefinder.MainActivity;
 import com.lazackna.juicefinder.R;
+
+import com.lazackna.juicefinder.databinding.FragmentFilterBinding;
+import com.lazackna.juicefinder.util.FilterSettings;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +31,8 @@ public class FilterFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private FragmentFilterBinding binding;
 
     public FilterFragment() {
         // Required empty public constructor
@@ -61,6 +69,31 @@ public class FilterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_filter, container, false);
+        this.binding = FragmentFilterBinding.inflate(inflater, container, false);
+
+        this.binding.filterApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int maxResults = Integer.parseInt(binding.filterResults.getText().toString());
+                int distance = Integer.parseInt(binding.filterDistance.getText().toString());
+                String unit = "miles";
+                if (binding.filterUnit.isChecked()) unit = "km";
+
+                if (maxResults < 0) maxResults = 0;
+                if (maxResults > 400) maxResults = 400;
+                if (distance < 0) distance = 0;
+                if (distance > 100) distance = 100;
+
+                FilterSettings settings = new FilterSettings();
+                settings.distance = distance;
+                settings.maxResults = maxResults;
+                settings.unit = unit;
+
+                MainActivity.viewModel.setSettings(settings);
+
+            }
+        });
+
+        return this.binding.getRoot();
     }
 }

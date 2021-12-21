@@ -16,12 +16,14 @@ public class MapThread extends Thread{
     private ApiHandler apiHandler;
     private String TAG;
     private IRootCallback callback;
+    private FilterSettings settings;
 
-    public MapThread(Location location, ApiHandler apiHandler, String TAG, IRootCallback callback) {
+    public MapThread(Location location, ApiHandler apiHandler, String TAG, IRootCallback callback, FilterSettings settings) {
         this.location = location;
         this.apiHandler = apiHandler;
         this.TAG = TAG;
         this.callback = callback;
+        this.settings = settings;
     }
 
     @Override
@@ -39,9 +41,10 @@ public class MapThread extends Thread{
                 new OpenChargeMapRequestBuilder()
                         .Location(location.getLatitude(), location.getLongitude())
                         .CountryCode("NL")
-                        .Distance(10)
+                        .Distance(this.settings.distance)
                         .IncludeComments()
-                        .MaxResults(100)
+                        .DistanceUnit(this.settings.unit)
+                        .MaxResults(this.settings.maxResults)
                         .build(this.apiHandler.getApiKey()).toUrl()
         );
     }

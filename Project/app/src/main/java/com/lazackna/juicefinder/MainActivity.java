@@ -1,8 +1,10 @@
 package com.lazackna.juicefinder;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -12,13 +14,17 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.lazackna.juicefinder.databinding.ActivityMainBinding;
+import com.lazackna.juicefinder.fragments.FilterFragment;
 import com.lazackna.juicefinder.fragments.MapFragment;
 import com.lazackna.juicefinder.fragments.PopupFragment;
 import com.lazackna.juicefinder.util.FilterSettings;
+import com.lazackna.juicefinder.util.FilterViewModel;
+import com.lazackna.juicefinder.util.IFilterSubscriber;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 
 import org.osmdroid.config.Configuration;
@@ -26,13 +32,14 @@ import org.osmdroid.config.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMarkerClickListener{
+public class MainActivity extends AppCompatActivity implements OnMarkerClickListener, IFilterSubscriber {
 
     private ActivityMainBinding binding;
     private FragmentManager manager;
     private boolean popupActive = false;
 
-    public static FilterSettings filterSettings;
+    public static FilterViewModel viewModel;
+
 
 
     @Override
@@ -42,8 +49,29 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         binding = ActivityMainBinding.inflate(LayoutInflater.from(this));
         setContentView(binding.getRoot());
 
+        setSupportActionBar(binding.myToolbar);
+        binding.myToolbar.showOverflowMenu();
+
         requestPermissions();
         initialize();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_filter:
+                makeFilterFragment();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void requestPermissions() {
@@ -103,7 +131,11 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         Configuration.getInstance().setUserAgentValue("JuiceFinder");
 
         this.manager = getSupportFragmentManager();
-        filterSettings = new FilterSettings();
+        viewModel = new ViewModelProvider(this).get(FilterViewModel.class);
+        viewModel.getSettings().observe(this, s -> {
+            if(popupActive)
+            onBackPressed();
+        });
         clearBackstack();
         makeMapFragment();
 
@@ -117,7 +149,21 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
                 .commit();
     }
 
+    private void makeFilterFragment() {
+        if (popupActive) return;
+        Bundle bundle = new Bundle();
+
+        this.manager.beginTransaction()
+                .setReorderingAllowed(false)
+                .add(binding.fragmentHolder.getId(), FilterFragment.class, bundle, "filterFragment")
+                .addToBackStack("filter")
+                .commit();
+        popupActive = true;
+        setMapInteraction(popupActive);
+    }
+
     private void makePopupFragment(Feature f) {
+        if (popupActive) return;
         Bundle bundle = new Bundle();
         bundle.putSerializable("feature", f);
 
@@ -159,5 +205,10 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         //TODO add check if fragment already exists.
         if(!popupActive)
             makePopupFragment(f);
+    }
+
+    @Override
+    public void notifySubscriber(FilterSettings settings) {
+
     }
 }

@@ -11,6 +11,7 @@ public class OpenChargeMapRequestBuilder {
     private Boolean includeComments;
     private int maxResults;
     private int distance;
+    private String distanceUnit = "miles";
 
     public OpenChargeMapRequestBuilder() {
 
@@ -28,6 +29,15 @@ public class OpenChargeMapRequestBuilder {
 
     public OpenChargeMapRequestBuilder CountryCode(String countryCode){
         this.countryCode = countryCode;
+        return this;
+    }
+
+    public OpenChargeMapRequestBuilder DistanceUnit(String distanceUnit) {
+        if (!(distanceUnit.equals("km") || distanceUnit.equals("miles")))
+            this.distanceUnit = "miles";
+        else
+            this.distanceUnit = distanceUnit;
+
         return this;
     }
 
