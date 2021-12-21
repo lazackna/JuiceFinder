@@ -3,6 +3,7 @@ package com.lazackna.juicefinder;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import com.lazackna.juicefinder.fragments.PopupFragment;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.util.GeoPoint;
 
 public class MainActivity extends AppCompatActivity implements OnMarkerClickListener{
 
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         popupActive = true;
         MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
         mapFragment.setMapInteraction(popupActive);
+        mapFragment.drawRouteFromUser(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]), Color.BLUE);
     }
 
     @Override

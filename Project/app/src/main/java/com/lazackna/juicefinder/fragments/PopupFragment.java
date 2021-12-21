@@ -63,6 +63,7 @@ public class PopupFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Bundle bundle = requireArguments();
+
         Feature f = (Feature) bundle.getSerializable("feature");
         return inflater.inflate(R.layout.fragment_popup, container, false);
     }

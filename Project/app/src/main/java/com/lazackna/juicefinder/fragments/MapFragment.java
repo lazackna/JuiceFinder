@@ -3,6 +3,7 @@ package com.lazackna.juicefinder.fragments;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -161,19 +162,25 @@ public class MapFragment extends Fragment {
         }
         double[] coords = root.features[0].geometry.coordinates;
         GeoPoint point = new GeoPoint(coords[1], coords[0]);
-
         binding.map.getController().setCenter(point);
+    }
 
-        ArrayList<GeoPoint> points = new ArrayList<>();
-        markerMap.values().forEach(val -> points.add(new GeoPoint(val.geometry.coordinates[1], val.geometry.coordinates[0])));
+    public void drawRouteFromUser(GeoPoint geoPoint, int color){
+        System.out.println();
 
-        try {
-            Road road = new DownloadRoadTask(getContext(), points).execute().get();
-            drawRouteOnMap(road, Color.RED);
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
+        GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(requireContext());
+        Location lastKnownLocation = locationProvider.getLastKnownLocation();
+        if(lastKnownLocation != null) {
+            ArrayList<GeoPoint> points = new ArrayList<>();
+            points.add(new GeoPoint(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+            points.add(geoPoint);
+            try {
+                Road road = new DownloadRoadTask(getContext(), points).execute().get();
+                drawRouteOnMap(road, color);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
     }
 
     public void drawRouteOnMap(@NotNull Road road, int color) {
