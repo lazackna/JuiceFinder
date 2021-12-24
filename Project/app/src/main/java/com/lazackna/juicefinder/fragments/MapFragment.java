@@ -259,7 +259,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());
             this.mapThread.start();
         }
-        
+
         Marker m = this.geofencingHandler.Geofence(this.markerMap.keySet(), location);
         if(m == null) {
             GeoPoint g = new GeoPoint(location);
