@@ -74,8 +74,12 @@ public class FilterFragment extends Fragment {
         this.binding.filterApply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int maxResults = Integer.parseInt(binding.filterResults.getText().toString());
-                int distance = Integer.parseInt(binding.filterDistance.getText().toString());
+                int maxResults = 100;
+                int distance = 10;
+                if(!binding.filterResults.getText().toString().equals(""))
+                    maxResults = Integer.parseInt(binding.filterResults.getText().toString());
+                if(!binding.filterDistance.getText().toString().equals(""))
+                distance = Integer.parseInt(binding.filterDistance.getText().toString());
                 FilterSettings.Unit unit = FilterSettings.Unit.MILES;
                 if (binding.filterUnit.isChecked()) unit = FilterSettings.Unit.KM;
 
