@@ -19,11 +19,6 @@ public class OpenChargeMapRequestBuilder {
 
     public OpenChargeMapRequest build(String key){
         this.key = key;
-//        this.output = "geojson";
-//        this.countryCode = "NL";
-//        this.location = new GeoPoint(0.0d, 0.0d);
-//        this.maxResults = 1000;
-//        this.distance = 1000;
         return new OpenChargeMapRequest(this);
     }
 
@@ -33,10 +28,10 @@ public class OpenChargeMapRequestBuilder {
     }
 
     public OpenChargeMapRequestBuilder DistanceUnit(String distanceUnit) {
-        if (!(distanceUnit.equals("km") || distanceUnit.equals("miles")))
+        if (distanceUnit.equals("miles"))
             this.distanceUnit = "miles";
-        else
-            this.distanceUnit = distanceUnit;
+        else if (distanceUnit.equals("km"))
+            this.distanceUnit = "km";
 
         return this;
     }
@@ -87,5 +82,9 @@ public class OpenChargeMapRequestBuilder {
 
     public int getDistance() {
         return distance;
+    }
+
+    public String getUnit() {
+        return distanceUnit;
     }
 }
