@@ -3,11 +3,11 @@
     <string name="app_name">JuiceFinder</string>
     <string name="next">Volgende</string>
     <string name="previous">Vorige</string>
-    <string name="image_of_ev_charging_station">afbeelding van EV oplaadstation</string>
     <string name="details_goto_desc">ga naar deze oplader</string>
-    <string name="details_closeButton_desc">a sluit knop</string>
+    <string name="details_closeButton_desc">een sluit knop</string>
     <string name="filter_max_results">Max resultaten</string>
     <string name="filter_distance">Afstand</string>
     <string name="filter_distance_unit_use_kilometers">Eenheid (gerbuik kilometers)</string>
     <string name="filter_apply_button_desc">Gebruik filters</string>
+    <string name="image_of_ev_charging_station">afbeelding van een EV oplaadpunt</string>
 </resources>
