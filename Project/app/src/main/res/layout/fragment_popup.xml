@@ -5,96 +5,110 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.PopupFragment">
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <View
-        android:id="@+id/background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:background="#BC8BC34A"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
 
-    <ImageView
-        android:id="@+id/ChargerTypeIcon"
-        android:layout_width="128dp"
-        android:layout_height="212dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/background"
-        android:src="@drawable/charger_red"/>
-
-    <TextView
-        android:id="@+id/details_chr_name"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
-        android:fontFamily="@font/inria_sans_bold"
-        android:text="Abdisstraat 25"
-        android:autoSizeTextType="uniform"
-        android:autoSizeStepGranularity="2sp"
-        android:autoSizeMinTextSize="2dp"
-        android:autoSizeMaxTextSize="200dp"
-        app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
-        app:layout_constraintTop_toTopOf="@+id/background" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/details_chr_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/inria_sans"
-        android:text="Type 2"
-        android:textSize="20dp"
-        app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
-        app:layout_constraintTop_toBottomOf="@+id/details_chr_name" />
+        <View
+            android:id="@+id/background"
+            android:layout_width="342dp"
+            android:layout_height="270dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
+            android:background="#BC8BC34A"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/details_chr_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/inria_sans"
-        android:text="0.00 jaarabonnement"
-        android:textSize="20dp"
-        app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
-        app:layout_constraintTop_toBottomOf="@+id/details_chr_type" />
+        <ImageView
+            android:id="@+id/ChargerTypeIcon"
+            android:layout_width="128dp"
+            android:layout_height="212dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/charger_red"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/background" />
 
-    <TextView
-        android:id="@+id/details_chr_power"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="11 Kw"
-        app:layout_constraintEnd_toEndOf="@+id/ChargerTypeIcon"
-        app:layout_constraintStart_toStartOf="@+id/ChargerTypeIcon"
-        app:layout_constraintTop_toBottomOf="@+id/ChargerTypeIcon" />
+        <TextView
+            android:id="@+id/details_chr_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="40dp"
+            android:autoSizeMaxTextSize="200dp"
+            android:autoSizeMinTextSize="2dp"
+            android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
+            android:fontFamily="@font/inria_sans_bold"
+            android:text="streetname"
+            app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
+            app:layout_constraintTop_toTopOf="@+id/background" />
 
-    <Button
-        android:id="@+id/details_route_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="go to this charge"
-        app:layout_constraintBottom_toBottomOf="@+id/background"
-        app:layout_constraintEnd_toEndOf="@+id/background"
-        app:layout_constraintStart_toStartOf="@+id/background"
-        app:layout_constraintTop_toTopOf="@+id/background"
-        app:layout_constraintVertical_bias="0.93" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/details_chr_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inria_sans"
+            android:text="Type"
+            android:textSize="20dp"
+            app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
+            app:layout_constraintTop_toBottomOf="@+id/details_chr_name" />
+
+        <TextView
+            android:id="@+id/details_chr_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/inria_sans"
+            android:text="price"
+            android:textSize="20dp"
+            app:layout_constraintStart_toEndOf="@+id/ChargerTypeIcon"
+            app:layout_constraintTop_toBottomOf="@+id/details_chr_type" />
+
+        <TextView
+            android:id="@+id/details_chr_power"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="power"
+            app:layout_constraintEnd_toEndOf="@+id/ChargerTypeIcon"
+            app:layout_constraintStart_toStartOf="@+id/ChargerTypeIcon"
+            app:layout_constraintTop_toBottomOf="@+id/ChargerTypeIcon" />
+
+        <Button
+            android:id="@+id/details_route_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="go to this charge"
+            app:layout_constraintBottom_toBottomOf="@+id/background"
+            app:layout_constraintEnd_toEndOf="@+id/background"
+            app:layout_constraintHorizontal_bias="0.838"
+            app:layout_constraintStart_toStartOf="@+id/background"
+            app:layout_constraintTop_toTopOf="@+id/background"
+            app:layout_constraintVertical_bias="0.896" />
+
+        <ImageButton
+            android:id="@+id/details_popup_close"
+            android:layout_width="49dp"
+            android:layout_height="52dp"
+            android:src="@drawable/sharp_add_black_36"
+            android:rotation="45"
+            android:background="@null"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="@+id/background"
+            app:layout_constraintTop_toTopOf="@+id/background" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </FrameLayout>

@@ -94,6 +94,10 @@ public class PopupFragment extends Fragment {
         binding.detailsChrPrice.setText(f.properties.connectionType);
         binding.detailsChrType.setText(f.type);
 
+        binding.detailsPopupClose.setOnClickListener(click ->{
+            getActivity().onBackPressed();
+        });
+
         binding.detailsRouteStart.setOnClickListener(click ->{
             getActivity().onBackPressed();
             mCallback.setRouteTo(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]));
