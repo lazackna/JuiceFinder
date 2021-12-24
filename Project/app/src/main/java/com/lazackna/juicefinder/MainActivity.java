@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
 
         if (!permissionsToRequest.isEmpty()) {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[]{}), 0);
+        } else {
+            initialize();
         }
     }
 
