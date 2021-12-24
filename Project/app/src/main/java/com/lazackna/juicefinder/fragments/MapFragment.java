@@ -27,6 +27,7 @@ import com.lazackna.juicefinder.util.API.ApiHandler;
 import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
 import com.lazackna.juicefinder.util.FilterSettings;
 import com.lazackna.juicefinder.util.GPS.GPSManager;
+import com.lazackna.juicefinder.util.GPS.GeofencingHandler;
 import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
 import com.lazackna.juicefinder.util.IRootCallback;
 import com.lazackna.juicefinder.util.MapThread;
@@ -79,6 +80,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     private GPSManager manager;
     private Location lastLocation;
+    private GeofencingHandler geofencingHandler;
     private boolean firstUpdate = false;
 
     private MapThread mapThread;
@@ -131,7 +133,6 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         binding.map.getOverlays().add(locationNewOverlay);
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
-
     }
 
     private void clearMap() {
@@ -238,6 +239,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         this.manager = GPSManager.getInstance(getContext());
         this.manager.subscribe(this);
         this.manager.start(getContext());
+        this.geofencingHandler = new GeofencingHandler();
     }
 
     private void showRetrievingMessage() {
@@ -257,9 +259,16 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());
             this.mapThread.start();
         }
+        
+        Marker m = this.geofencingHandler.Geofence(this.markerMap.keySet(), location);
+        if(m == null) {
+            GeoPoint g = new GeoPoint(location);
+            this.binding.map.getController().animateTo(g);
+        } else {
+            Log.d(TAG, "Close to marker: " + m.toString());
+            this.binding.map.getController().animateTo(m.getPosition());
+        }
 
-        GeoPoint g = new GeoPoint(location);
-        this.binding.map.getController().animateTo(g);
     }
 
     @Override
