@@ -248,9 +248,10 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     @Override
     public void notifyLocationChanged(Location location) {
+        if (location == null) return;
         lastLocation = location;
 
-        if (!firstUpdate && location != null) {
+        if (!firstUpdate) {
             firstUpdate = true;
             showRetrievingMessage();
             this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());

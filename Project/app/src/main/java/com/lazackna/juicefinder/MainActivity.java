@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         binding.myToolbar.showOverflowMenu();
 
         requestPermissions();
-        initialize();
+       // initialize();
     }
 
     @Override
@@ -108,17 +108,33 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private boolean allPermissionsGranted() {
+        return hasInternetPermission() && hasLocationCoarsePermission() && hasLocationFinePermission();
+    }
+
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode != 0 || grantResults.length == 0) return;
-
+        List<String> denied = new ArrayList<>();
         for (int i = 0; i < grantResults.length; i++) {
-            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) continue;
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                denied.add(permissions[i]);
+                continue;
+            }
 
             Log.d("PermissionsRequest", permissions[i] + " granted.");
         }
+
+        if (!denied.isEmpty()) {
+            ActivityCompat.requestPermissions(this, denied.toArray(new String[]{}), 0);
+        }
+
+        if (allPermissionsGranted()) {
+            initialize();
+        }
+
     }
 
     private void clearBackstack() {
