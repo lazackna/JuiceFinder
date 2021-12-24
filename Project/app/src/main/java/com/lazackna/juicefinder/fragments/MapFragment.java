@@ -84,6 +84,9 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
     private MapThread mapThread;
     private static int selectedMarker = 0;
 
+
+    private static Overlay drawnRoadOverlay;
+
     public MapFragment() {
         // Required empty public constructor
     }
@@ -213,6 +216,11 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         PolyOverlayWithIW overlay = RoadManager.buildRoadOverlay(road, color, 20f);
         this.binding.map.getOverlays().add(overlay);
         this.binding.map.invalidate();
+
+        if(drawnRoadOverlay != null){
+            this.binding.map.getOverlays().remove(drawnRoadOverlay);
+        }
+        drawnRoadOverlay = overlay;
     }
 
     @Override
@@ -258,8 +266,11 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             this.mapThread.start();
         }
 
-        GeoPoint g = new GeoPoint(location);
-        this.binding.map.getController().animateTo(g);
+        if(drawnRoadOverlay != null){
+            GeoPoint g = new GeoPoint(location);
+            this.binding.map.getController().animateTo(g);
+            this.binding.map.invalidate();
+        }
     }
 
     @Override

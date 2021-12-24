@@ -1,6 +1,5 @@
 package com.lazackna.juicefinder.fragments;
 
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,9 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentPopupBinding;
 import com.lazackna.juicefinder.util.juiceroot.Connection;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
@@ -23,6 +20,13 @@ import org.osmdroid.util.GeoPoint;
  * create an instance of this fragment.
  */
 public class PopupFragment extends Fragment {
+
+    GotoClicked mCallback;
+
+    public interface GotoClicked {
+        public void setRouteTo(GeoPoint geoPoint);
+    }
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,6 +68,13 @@ public class PopupFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        try {
+            mCallback = (GotoClicked) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement GotoClicked");
+        }
     }
 
 
@@ -84,8 +95,8 @@ public class PopupFragment extends Fragment {
         binding.detailsChrType.setText(f.type);
 
         binding.detailsRouteStart.setOnClickListener(click ->{
-            //TODO: add creation of route here
-            //mapFragment.drawRouteFromUser(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]), Color.BLUE);
+            getActivity().onBackPressed();
+            mCallback.setRouteTo(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]));
         });
 
         return binding.getRoot();

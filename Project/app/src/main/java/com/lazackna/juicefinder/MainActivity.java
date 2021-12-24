@@ -13,11 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.lazackna.juicefinder.databinding.ActivityMainBinding;
 import com.lazackna.juicefinder.fragments.FilterFragment;
@@ -34,7 +30,7 @@ import org.osmdroid.util.GeoPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMarkerClickListener, IFilterSubscriber {
+public class MainActivity extends AppCompatActivity implements OnMarkerClickListener, IFilterSubscriber, PopupFragment.GotoClicked {
 
     private ActivityMainBinding binding;
     private FragmentManager manager;
@@ -197,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
 
     @Override
     public void onBackPressed(){
-
         if (manager.getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping backstack");
             manager.popBackStack();
@@ -220,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
 
     @Override
     public void onClick(Feature f) {
-        //TODO add check if fragment already exists.
         if(!popupActive)
             makePopupFragment(f);
     }
@@ -228,5 +222,13 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
     @Override
     public void notifySubscriber(FilterSettings settings) {
 
+    }
+
+    @Override
+    public void setRouteTo(GeoPoint geoPoint) {
+        MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
+        if(mapFragment != null){
+            mapFragment.drawRouteFromUser(geoPoint, Color.RED);
+        }
     }
 }
