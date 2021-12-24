@@ -164,7 +164,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
         for  (Feature f : root.features) {
             if (settings != null)
-            if (markersPut >= settings.maxResults) break;
+            if (markersPut >= settings.getMaxResults()) break;
             double[] coords = f.geometry.coordinates;
             GeoPoint point = new GeoPoint(coords[1], coords[0]);
             Marker marker = new Marker(binding.map);
