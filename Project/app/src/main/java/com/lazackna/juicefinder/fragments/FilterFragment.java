@@ -76,8 +76,8 @@ public class FilterFragment extends Fragment {
             public void onClick(View v) {
                 int maxResults = Integer.parseInt(binding.filterResults.getText().toString());
                 int distance = Integer.parseInt(binding.filterDistance.getText().toString());
-                String unit = "miles";
-                if (binding.filterUnit.isChecked()) unit = "km";
+                FilterSettings.Unit unit = FilterSettings.Unit.MILES;
+                if (binding.filterUnit.isChecked()) unit = FilterSettings.Unit.KM;
 
                 if (maxResults < 0) maxResults = 0;
                 if (maxResults > 400) maxResults = 400;
@@ -85,9 +85,9 @@ public class FilterFragment extends Fragment {
                 if (distance > 100) distance = 100;
 
                 FilterSettings settings = new FilterSettings();
-                settings.distance = distance;
-                settings.maxResults = maxResults;
-                settings.unit = unit;
+                settings.setDistance(distance);
+                settings.setMaxResults(maxResults);
+                settings.setUnit(unit);
 
                 MainActivity.viewModel.setSettings(settings);
 

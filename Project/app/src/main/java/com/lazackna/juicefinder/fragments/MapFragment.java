@@ -1,6 +1,10 @@
 package com.lazackna.juicefinder.fragments;
 
 import android.location.Location;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -23,25 +27,33 @@ import com.lazackna.juicefinder.util.API.ApiHandler;
 import com.lazackna.juicefinder.util.API.OpenChargeMapRequestBuilder;
 import com.lazackna.juicefinder.util.FilterSettings;
 import com.lazackna.juicefinder.util.GPS.GPSManager;
+import com.lazackna.juicefinder.util.GPS.GeofencingHandler;
 import com.lazackna.juicefinder.util.GPS.IGPSSubscriber;
 import com.lazackna.juicefinder.util.IRootCallback;
 import com.lazackna.juicefinder.util.MapThread;
+import com.lazackna.juicefinder.util.API.DownloadRoadTask;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 import com.lazackna.juicefinder.util.juiceroot.JuiceRoot;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.PolyOverlayWithIW;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,10 +80,14 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     private GPSManager manager;
     private Location lastLocation;
+    private GeofencingHandler geofencingHandler;
     private boolean firstUpdate = false;
 
     private MapThread mapThread;
     private static int selectedMarker = 0;
+
+
+    private static Overlay drawnRoadOverlay;
 
     public MapFragment() {
         // Required empty public constructor
@@ -113,10 +129,13 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         MyLocationNewOverlay locationNewOverlay = new MyLocationNewOverlay(
                 new GpsMyLocationProvider(requireContext()), binding.map);
         locationNewOverlay.enableMyLocation();
+        Bitmap icon = BitmapFactory.decodeResource(getContext().getResources(),
+                R.drawable.car);
+        locationNewOverlay.setDirectionArrow(icon, icon);
+        locationNewOverlay.setPersonIcon(icon);
         binding.map.getOverlays().add(locationNewOverlay);
         binding.map.getController().zoomTo(14.0d);
         binding.map.setMultiTouchControls(true);
-
     }
 
     private void clearMap() {
@@ -148,29 +167,25 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
         for  (Feature f : root.features) {
             if (settings != null)
-            if (markersPut >= settings.maxResults) break;
+            if (markersPut >= settings.getMaxResults()) break;
             double[] coords = f.geometry.coordinates;
             GeoPoint point = new GeoPoint(coords[1], coords[0]);
             Marker marker = new Marker(binding.map);
             marker.setPosition(point);
-            marker.setAnchor(Marker.ANCHOR_LEFT, Marker.ANCHOR_LEFT);
+            marker.setAnchor(0.2f, 0.2f);
             marker.setInfoWindow(null);
             marker.setIcon(ResourcesCompat.getDrawable(this.getResources(), R.drawable.charger_icon, null));
             this.binding.map.getOverlays().add(marker);
-
             this.markerMap.put(marker,f);
             markersPut++;
-            marker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    //TODO only select top marker.
-                    Feature f = markerMap.get(marker);
-                    if (getActivity() instanceof OnMarkerClickListener) {
-                        OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
-                        a.onClick(f);
-                    }
-                    return false;
+            marker.setOnMarkerClickListener((marker1, mapView) -> {
+                //TODO only select top marker.
+                Feature f1 = markerMap.get(marker1);
+                if (getActivity() instanceof OnMarkerClickListener) {
+                    OnMarkerClickListener a = (OnMarkerClickListener) getActivity();
+                    a.onClick(f1);
                 }
+                return false;
             });
         }
         try {
@@ -181,6 +196,32 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         } catch (Exception e) {
 
         }
+    }
+
+    public void drawRouteFromUser(GeoPoint geoPoint, int color){
+        if(lastLocation != null) {
+            ArrayList<GeoPoint> points = new ArrayList<>();
+            points.add(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
+            points.add(geoPoint);
+            try {
+                Road road = new DownloadRoadTask(getContext(), points).execute().get();
+                drawRouteOnMap(road, color);
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void drawRouteOnMap(@NotNull Road road, int color) {
+        Log.i(TAG, "Drawing route");
+        PolyOverlayWithIW overlay = RoadManager.buildRoadOverlay(road, color, 20f);
+        this.binding.map.getOverlays().add(overlay);
+        this.binding.map.invalidate();
+
+        if(drawnRoadOverlay != null){
+            this.binding.map.getOverlays().remove(drawnRoadOverlay);
+        }
+        drawnRoadOverlay = overlay;
     }
 
     @Override
@@ -206,6 +247,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         this.manager = GPSManager.getInstance(getContext());
         this.manager.subscribe(this);
         this.manager.start(getContext());
+        this.geofencingHandler = new GeofencingHandler();
     }
 
     private void showRetrievingMessage() {
@@ -214,20 +256,32 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
             Snackbar.make(view, "Retrieving charging points", Snackbar.LENGTH_SHORT).show();
     }
 
-
     @Override
     public void notifyLocationChanged(Location location) {
+        if (location == null) return;
         lastLocation = location;
 
-        if (!firstUpdate && location != null) {
+        if (!firstUpdate) {
             firstUpdate = true;
             showRetrievingMessage();
             this.mapThread = new MapThread(location, this.apiHandler, TAG, this, new FilterSettings());
             this.mapThread.start();
         }
 
-        GeoPoint g = new GeoPoint(location);
-        this.binding.map.getController().animateTo(g);
+        if(drawnRoadOverlay != null){
+            GeoPoint g = new GeoPoint(location);
+            this.binding.map.getController().animateTo(g);
+            this.binding.map.invalidate();
+        }
+        Marker m = this.geofencingHandler.Geofence(this.markerMap.keySet(), location);
+        if(m == null) {
+            GeoPoint g = new GeoPoint(location);
+            this.binding.map.getController().animateTo(g);
+        } else {
+            Log.d(TAG, "Close to marker: " + m.toString());
+            this.binding.map.getController().animateTo(m.getPosition());
+        }
+
     }
 
     @Override

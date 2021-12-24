@@ -41,10 +41,10 @@ public class MapThread extends Thread{
                 new OpenChargeMapRequestBuilder()
                         .Location(location.getLatitude(), location.getLongitude())
                         .CountryCode("NL")
-                        .Distance(this.settings.distance)
+                        .Distance(this.settings.getDistance())
                         .IncludeComments()
-                        .DistanceUnit(this.settings.unit)
-                        .MaxResults(this.settings.maxResults)
+                        .DistanceUnit(this.settings.getUnit())
+                        .MaxResults(this.settings.getMaxResults())
                         .build(this.apiHandler.getApiKey()).toUrl()
         );
     }

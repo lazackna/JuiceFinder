@@ -7,12 +7,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.lazackna.juicefinder.R;
 import com.lazackna.juicefinder.databinding.FragmentPopupBinding;
 import com.lazackna.juicefinder.util.juiceroot.Connection;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
+
+import org.osmdroid.util.GeoPoint;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,6 +20,13 @@ import com.lazackna.juicefinder.util.juiceroot.Feature;
  * create an instance of this fragment.
  */
 public class PopupFragment extends Fragment {
+
+    GotoClicked mCallback;
+
+    public interface GotoClicked {
+        public void setRouteTo(GeoPoint geoPoint);
+    }
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -61,6 +68,13 @@ public class PopupFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        try {
+            mCallback = (GotoClicked) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement GotoClicked");
+        }
     }
 
 
@@ -70,6 +84,7 @@ public class PopupFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         Bundle bundle = requireArguments();
+
         Feature f = (Feature) bundle.getSerializable("feature");
 
         binding = FragmentPopupBinding.inflate(inflater, container, false);
@@ -78,6 +93,15 @@ public class PopupFragment extends Fragment {
         binding.detailsChrPower.setText(getPowerLevelString(f.properties.poi.connections));
         binding.detailsChrPrice.setText(f.properties.connectionType);
         binding.detailsChrType.setText(f.type);
+
+        binding.detailsPopupClose.setOnClickListener(click ->{
+            getActivity().onBackPressed();
+        });
+
+        binding.detailsRouteStart.setOnClickListener(click ->{
+            getActivity().onBackPressed();
+            mCallback.setRouteTo(new GeoPoint(f.geometry.coordinates[1], f.geometry.coordinates[0]));
+        });
 
         return binding.getRoot();
     }

@@ -8,15 +8,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 
 import com.lazackna.juicefinder.databinding.ActivityMainBinding;
 import com.lazackna.juicefinder.fragments.FilterFragment;
@@ -28,11 +25,12 @@ import com.lazackna.juicefinder.util.IFilterSubscriber;
 import com.lazackna.juicefinder.util.juiceroot.Feature;
 
 import org.osmdroid.config.Configuration;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMarkerClickListener, IFilterSubscriber {
+public class MainActivity extends AppCompatActivity implements OnMarkerClickListener, IFilterSubscriber, PopupFragment.GotoClicked {
 
     private ActivityMainBinding binding;
     private FragmentManager manager;
@@ -53,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         binding.myToolbar.showOverflowMenu();
 
         requestPermissions();
-        initialize();
+       // initialize();
     }
 
     @Override
@@ -91,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
 
         if (!permissionsToRequest.isEmpty()) {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[]{}), 0);
+        } else {
+            initialize();
         }
     }
 
@@ -106,17 +106,33 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private boolean allPermissionsGranted() {
+        return hasInternetPermission() && hasLocationCoarsePermission() && hasLocationFinePermission();
+    }
+
 
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode != 0 || grantResults.length == 0) return;
-
+        List<String> denied = new ArrayList<>();
         for (int i = 0; i < grantResults.length; i++) {
-            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) continue;
+            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                denied.add(permissions[i]);
+                continue;
+            }
 
             Log.d("PermissionsRequest", permissions[i] + " granted.");
         }
+
+        if (!denied.isEmpty()) {
+            ActivityCompat.requestPermissions(this, denied.toArray(new String[]{}), 0);
+        }
+
+        if (allPermissionsGranted()) {
+            initialize();
+        }
+
     }
 
     private void clearBackstack() {
@@ -173,13 +189,12 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
                 .addToBackStack("popup")
                 .commit();
         popupActive = true;
-        setMapInteraction(popupActive);
-
+        MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
+        mapFragment.setMapInteraction(popupActive);
     }
 
     @Override
     public void onBackPressed(){
-
         if (manager.getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping backstack");
             manager.popBackStack();
@@ -202,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
 
     @Override
     public void onClick(Feature f) {
-        //TODO add check if fragment already exists.
         if(!popupActive)
             makePopupFragment(f);
     }
@@ -210,5 +224,13 @@ public class MainActivity extends AppCompatActivity implements OnMarkerClickList
     @Override
     public void notifySubscriber(FilterSettings settings) {
 
+    }
+
+    @Override
+    public void setRouteTo(GeoPoint geoPoint) {
+        MapFragment mapFragment = (MapFragment) this.manager.findFragmentByTag("mapFragment");
+        if(mapFragment != null){
+            mapFragment.drawRouteFromUser(geoPoint, Color.RED);
+        }
     }
 }
