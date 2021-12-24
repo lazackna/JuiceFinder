@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">JuiceFinder</string>
+    <string name="details_goto_desc">この充電器に行きます</string>
+    <string name="image_of_ev_charging_station">EV充電ステーションの画像</string>
+    <string name="details_closeButton_desc">閉じるボタン</string>
+    <string name="filter_max_results">最大の結果</string>
+    <string name="filter_distance">距離</string>
+    <string name="filter_distance_unit_use_kilometers">距離単位（キロメートルを使用）</string>
+    <string name="filter_apply_button_desc">フィルタを適用する</string>
+</resources>
