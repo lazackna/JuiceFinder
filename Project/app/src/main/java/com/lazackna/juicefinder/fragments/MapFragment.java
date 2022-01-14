@@ -88,6 +88,8 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
 
     private static Overlay drawnRoadOverlay;
+    private boolean isRouteActive = false;
+    private GeoPoint destinationPoint = null;
 
     public MapFragment() {
         // Required empty public constructor
@@ -200,6 +202,7 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
 
     public void drawRouteFromUser(GeoPoint geoPoint, int color){
         if(lastLocation != null) {
+            this.destinationPoint = geoPoint;
             ArrayList<GeoPoint> points = new ArrayList<>();
             points.add(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
             points.add(geoPoint);
@@ -216,12 +219,11 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         Log.i(TAG, "Drawing route");
         PolyOverlayWithIW overlay = RoadManager.buildRoadOverlay(road, color, 20f);
         this.binding.map.getOverlays().add(overlay);
-        this.binding.map.invalidate();
 
-        if(drawnRoadOverlay != null){
-            this.binding.map.getOverlays().remove(drawnRoadOverlay);
-        }
+        removeRoute();
+
         drawnRoadOverlay = overlay;
+        this.isRouteActive = true;
     }
 
     @Override
@@ -277,11 +279,23 @@ public class MapFragment extends Fragment implements IGPSSubscriber, IRootCallba
         if(m == null) {
             GeoPoint g = new GeoPoint(location);
             this.binding.map.getController().animateTo(g);
+        } else if (this.isRouteActive) {
+            if(destinationPoint == null) return;
+            if(m.getPosition().equals(destinationPoint)) {
+                removeRoute();
+            }
         } else {
             Log.d(TAG, "Close to marker: " + m.toString());
             this.binding.map.getController().animateTo(m.getPosition());
         }
 
+    }
+
+    private void removeRoute() {
+        this.binding.map.invalidate();
+        if(drawnRoadOverlay != null){
+            this.binding.map.getOverlays().remove(drawnRoadOverlay);
+        }
     }
 
     @Override
